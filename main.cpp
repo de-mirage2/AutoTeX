@@ -67,9 +67,9 @@ void fillTeX(std::ofstream &logObj, std::vector<moduleObj> moduleVec,
         u.unit + std::to_string(u.subject) + std::to_string(u.module);
     logMsg(logObj, "Begin Generation: " + moduleName);
     std::cout << "Generating " << moduleName << '\n';
-    std::string inProb, inSol; // Strings that enter
-    int a, b, c, d, e, f;      // Short [-32768, 32767]
-    bool x, y, z;              // Booleans
+    std::string inProb, inSol;                    // Strings that enter
+    int a, a1, a2, a3, b, b1, b2, c, c1, d, e, f; // Short [-32768, 32767]
+    bool x, y, z;                                 // Booleans
 
     // The Spaghetti never fails you. You fail the Spaghetti.
 
@@ -79,13 +79,26 @@ void fillTeX(std::ofstream &logObj, std::vector<moduleObj> moduleVec,
       case 'L': {           // --Limits
         switch (u.module) { // Module
         case 110: {         // ---Limit Evaluation via Factoring lv. 1
-          a = rn_one(rng);  // \lim_{x\to a} (x+a)/(x+a)
-          b = rn_one(rng);  // (x + b)
+          a1 = rn_one(rng); // \lim_{x\to a1} (x+a1)(x+a2)/(x+a1)
+          a2 = rn_one(rng); // (x + a2)
+          b = a1 + a2;      // FOIL: Outer, Inner
+          c = a1 * a2;      // FOIL: Last
+          inProb =
+              repl(R"(\lim_{x \to -%} \frac{x^2+%x+%}{x+%})", {a1, b, c, a1});
+          inSol = std::to_string(a);
+          break;
+        }
+        case 111: {         // ---Limit Evaluation via Factoring lv. 2
+          a1 = rn_one(rng); // \lim_{x\to a1} (x+a1)(x+a2)(x+a3)/(x+a1)
+          a2 = rn_one(rng); // (x + a2)
+          a3 = rn_one(rng); // (x + a3)
           c = a + b;        // FOIL: Outer, Inner
           d = a * b;        // FOIL: Last
-          inProb = repl(R"(\lim_{x \to -%} \frac{x^2 + %x + %}{x + %})",
-                        {a, c, d, a});
+          inProb = repl(R"(\lim_{x \to -%} \frac{x^3+%x^2+%x+%}{x+%})",
+                        {a1, a1 + a2 + a3, a1 * a2 + a2 * a3 + a1 * a3,
+                         a1 * a2 * a3, a1});
           inSol = std::to_string(a);
+          break;
         }
         }
       }
@@ -102,7 +115,9 @@ void fillTeX(std::ofstream &logObj, std::vector<moduleObj> moduleVec,
 };
 
 void cleanTeX(std::ofstream &logObj, std::ofstream &outprobObj,
-              std::ofstream &outsolObj) {}
+              std::ofstream &outsolObj) {
+  std::string cleaningLine;
+}
 
 std::vector<moduleObj> interpretModules(std::string moduleString) {
   std::vector<moduleObj> retModuleVect;
