@@ -67,9 +67,9 @@ void fillTeX(std::ofstream &logObj, std::vector<moduleObj> moduleVec,
         u.unit + std::to_string(u.subject) + std::to_string(u.module);
     logMsg(logObj, "Begin Generation: " + moduleName);
     std::cout << "Generating " << moduleName << '\n';
-    std::string inProb, inSol;                    // Strings that enter
-    int a, a1, a2, a3, b, b1, b2, c, c1, d, e, f; // Short [-32768, 32767]
-    bool x, y, z;                                 // Booleans
+    std::string inProb, inSol;                  // Strings that enter
+    int a1, a2, a3, a4, b1, b2, c, c1, d, e, f; // Short [-32768, 32767]
+    bool x, y, z;                               // Booleans
 
     // The Spaghetti never fails you. You fail the Spaghetti.
 
@@ -81,25 +81,26 @@ void fillTeX(std::ofstream &logObj, std::vector<moduleObj> moduleVec,
         case 110: {         // ---Limit Evaluation via Factoring lv. 1
           a1 = rn_one(rng); // \lim_{x\to a1} (x+a1)(x+a2)/(x+a1)
           a2 = rn_one(rng); // (x + a2)
-          b = a1 + a2;      // FOIL: Outer, Inner
-          c = a1 * a2;      // FOIL: Last
-          inProb =
-              repl(R"(\lim_{x \to -%} \frac{x^2+%x+%}{x+%})", {a1, b, c, a1});
-          inSol = std::to_string(a);
+          inProb = repl(R"(\lim_{x \to -%} \frac{x^2+%x+%}{x+%})",
+                        {a1, a1 + a2, a1 * a2, a1});
+          inSol = std::to_string(a2);
           break;
         }
         case 111: {         // ---Limit Evaluation via Factoring lv. 2
           a1 = rn_one(rng); // \lim_{x\to a1} (x+a1)(x+a2)(x+a3)/(x+a1)
           a2 = rn_one(rng); // (x + a2)
           a3 = rn_one(rng); // (x + a3)
-          c = a + b;        // FOIL: Outer, Inner
-          d = a * b;        // FOIL: Last
           inProb = repl(R"(\lim_{x \to -%} \frac{x^3+%x^2+%x+%}{x+%})",
                         {a1, a1 + a2 + a3, a1 * a2 + a2 * a3 + a1 * a3,
                          a1 * a2 * a3, a1});
-          inSol = std::to_string(a);
+          inSol = std::to_string(a2 * a3);
           break;
         }
+        case 112:
+          a1 = rn_one(rng);
+          a2 = rn_one(rng);
+          a3 = rn_one(rng);
+          a4 = rn_one(rng);
         }
       }
       }
@@ -159,30 +160,21 @@ int main(int argc, char *argv[]) {
 
   if (argc == 1) {
 
-    std::cout /* << "List each module to be added with the format "
+    std::cout << "Select Modules:\n\n";
+
+    std::ifstream currmod("currmodules.txt");
+    std::string currmodLine;
+    while (getline(currmod, currmodLine)) {
+      std::cout << currmodLine;
+    }
+    /* << "List each module to be added with the format "
               << "A-B-WW,XX,YY,...;C-D-ZZ "
               << "where A is the subject letter, B is the unit letter, and
               WW, "
               << "XX, etc. being the modules. Separate different subject
               or unit "
               << "module collections by a single semicolon:\n\n"*/
-        << "\nSelect Modules:\n\n"
-        << "~~ CALCULUS ~~ (C)\n"
-        << "~ LIMITS ~ (L)\n"
-        //<< "000 - Graphical Limits (*)\n"
-        << "110 - Limit evaluation via Factoring (*)\n"
-        << "111 - Limit evaluation via Factoring (**)\n"
-        << "112 - Limit evaluation via Factoring (***)\n"
-        << "113 - Limit evaluation via Factoring (***)\n"
-        << "114 - Limit evaluation via Factoring (****)\n"
-        << "120 - Limit evaluation via Division (*)\n"
-        << "121 - Limit evaluation via Division (**)\n"
-        << "122 - Limit evaluation via Division (***)\n"
-
-        //<< "31 - Continuity at a Point (*)\n"
-        //<< "32 - Continuity at a Point (**)\n"
-        //<< "41 - Discontinuity Removal (*)\n"
-        << std::endl;
+    std::cout << std::endl;
     std::cin.clear();
     getline(std::cin, inp, '\n');
   } else {
