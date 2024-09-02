@@ -38,7 +38,7 @@
 *.app
 
 ### LaTeX ###
-*.tex
+# *.tex
 
 ## Core latex/pdflatex auxiliary files:
 *.aux

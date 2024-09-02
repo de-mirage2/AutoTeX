@@ -36,6 +36,43 @@ std::string repl(std::string str1, std::vector<int> intArr) {
   return ret;
 }
 
+std::string repl(std::string str1, std::vector<int> intArr,
+                 std::vector<char> condenseArr) {
+  // `repl` with ability to condense forms of + and -
+  std::string ret = str1;
+  int count = 0;
+  for (int i = 0; i < ret.length(); i++) {
+    if (ret.at(i) == '%') {
+      int u = intArr.at(count);
+      switch (condenseArr.at(count)) {
+      case 0: { // do nothing
+        ret.replace(i, 1, std::to_string(u));
+        break;
+      }
+      case 1: { // turn % = -7 into -7 and % = 7 into +7
+        ret.replace(i, 1,
+                    (u > 0 ? "+" : "") + (u != 0 ? std::to_string(u) : ""));
+        break;
+      }
+      case 2: { // case 1 but additionally turn 1 into "", -1 into "-",
+        if (u == 0) {
+          while (str1.at(i) != '+' || str1.at(i) != '-') {
+            ret.replace(i, 1, "");
+          }
+        } else if (u == 1) {
+          ret.replace(i, 1, "+");
+        } else if (u == -1) {
+          ret.replace(i, 1, "-");
+        } else
+          ret.replace(i, 1, (u > 0 ? "+" : "") + std::to_string(u));
+      }
+      }
+      count++;
+    }
+  }
+  return ret;
+}
+
 void logMsg(std::ofstream &logObj, std::string msg) {
   logObj << std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::system_clock::now().time_since_epoch())
@@ -67,9 +104,9 @@ void fillTeX(std::ofstream &logObj, std::vector<moduleObj> moduleVec,
         u.unit + std::to_string(u.subject) + std::to_string(u.module);
     logMsg(logObj, "Begin Generation: " + moduleName);
     std::cout << "Generating " << moduleName << '\n';
-    std::string inProb, inSol;                  // Strings that enter
-    int a1, a2, a3, a4, b1, b2, c, c1, d, e, f; // Short [-32768, 32767]
-    bool x, y, z;                               // Booleans
+    std::string inProb, inSol;                       // Strings that enter
+    int a1, a2, a3, a4, b1, b2, b3, c1, c2, d, e, f; // Short [-32768, 32767]
+    bool x, y, z;                                    // Booleans
 
     // The Spaghetti never fails you. You fail the Spaghetti.
 
@@ -79,28 +116,39 @@ void fillTeX(std::ofstream &logObj, std::vector<moduleObj> moduleVec,
       case 'L': {           // --Limits
         switch (u.module) { // Module
         case 110: {         // ---Limit Evaluation via Factoring lv. 1
-          a1 = rn_one(rng); // \lim_{x\to a1} (x+a1)(x+a2)/(x+a1)
+          a1 = rn_one(rng); // \lim_{x\to -a1} (x+a1)(x+a2)/(x+a1)
           a2 = rn_one(rng); // (x + a2)
-          inProb = repl(R"(\lim_{x \to -%} \frac{x^2+%x+%}{x+%})",
-                        {a1, a1 + a2, a1 * a2, a1});
-          inSol = std::to_string(a2);
+          inProb = repl(R"(\lim_{x \to %} \frac{x^2%x%}{x%})",
+                        {-a1, a1 + a2, a1 * a2, a1}, {0, 2, 1, 1});
+          inSol = std::to_string(a2 - a1);
           break;
         }
         case 111: {         // ---Limit Evaluation via Factoring lv. 2
           a1 = rn_one(rng); // \lim_{x\to a1} (x+a1)(x+a2)(x+a3)/(x+a1)
           a2 = rn_one(rng); // (x + a2)
           a3 = rn_one(rng); // (x + a3)
-          inProb = repl(R"(\lim_{x \to -%} \frac{x^3+%x^2+%x+%}{x+%})",
-                        {a1, a1 + a2 + a3, a1 * a2 + a2 * a3 + a1 * a3,
-                         a1 * a2 * a3, a1});
-          inSol = std::to_string(a2 * a3);
+          inProb = repl(R"(\lim_{x \to %} \frac{x^3%x^2%x%}{x%})",
+                        {-a1, a1 + a2 + a3, a1 * a2 + a2 * a3 + a1 * a3,
+                         a1 * a2 * a3, a1},
+                        {0, 2, 2, 1, 1});
+          inSol = std::to_string((a2 - a1) * (a3 - a1));
           break;
         }
-        case 112:
+        case 112: {
           a1 = rn_one(rng);
+          b1 = rn_one(rng);
           a2 = rn_one(rng);
+          b2 = rn_one(rng);
           a3 = rn_one(rng);
-          a4 = rn_one(rng);
+          b3 = rn_one(rng);
+          inProb =
+              repl(R"(\lim_{x \to \frac{%}{%}} \frac{%x^3+%x^2+%x+%}{x+%})",
+                   {-b1, a1, a1 * a2 * a3,
+                    a1 * a2 * b3 + a1 * b2 * a3 + b1 * a2 * a3,
+                    a1 * b2 * b3 + b1 * a2 * b3 + b1 * b2 * a3, b1 * b2 * b3},
+                   {0, 0, 0, 2, 2, 2, 1, 1});
+          inSol = std::to_string(3);
+        }
         }
       }
       }
@@ -165,7 +213,7 @@ int main(int argc, char *argv[]) {
     std::ifstream currmod("currmodules.txt");
     std::string currmodLine;
     while (getline(currmod, currmodLine)) {
-      std::cout << currmodLine;
+      std::cout << currmodLine << '\n';
     }
     /* << "List each module to be added with the format "
               << "A-B-WW,XX,YY,...;C-D-ZZ "

@@ -1,0 +1,21 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{mathtools,amssymb,amsfonts}
+%\usepackage{pgfplots}
+\begin{document}
+  \section{Limits}
+  \subsection{Evaulation via Factoring}
+  \setcounter{subsubsection}{-1}
+  \subsubsection{Level 1}
+  Returns a monic polynomial fraction limit problem of the form \[\lim_{x\to{c}}f(x)\] such that: \[f(x)=\frac{Q(x)}{P(x)}\] where \(P(c) = 0\) and is a linear factor of 2nd degree monic polynomial \(Q(x)\).
+  Defining in terms of constants and argument variable \(Q(x)=\left(x+a_1\right)\left(x+a_2\right)\) and \(P(x)=x+a_1\), the \LaTeX{} problem output is evaluated as: \[\lim_{x\to{-a_1}}\left(\frac{x^2+\left(a_1+a_2\right)x+a_1a_2}{x+a_1}\right)\]
+  The respective \LaTeX{} solution output is evaluated as \(a_2-a_1\)
+  \subsubsection{Level 2}
+  Returns a monic polynomial fraction limit problem of the form \[\lim_{x\to{c}}f(x)\] such that: \[f(x)=\frac{Q(x)}{P(x)}\] where \(P(c) = 0\) and is a linear factor of 3rd degree monic polynomial \(Q(x)\).
+  Defining in terms of constants and argument variable \(Q(x)=\left(x+a_1\right)\left(x+a_2\right)\left(x+a_3\right)\) and \(P(x)=x+a_1\), the \LaTeX{} output is evaluated as: \[\lim_{x\to{-a_1}}\left(\frac{x^3+\left(a_1+a_2+a_3\right)x^2+\left(a_1a_2+a_2a_3+a_1a_3\right)+a_1a_2a_3}{x+a_1}\right)\]
+  The respective \LaTeX{} solution output is evaluated as \(\left(a_2-a_1\right)\left(a_3-a_1\right)\)
+  \subsubsection{Level 3}
+  Returns a polynomial fraction limit problem of the form \[\lim_{x\to{c}}f(x)\] such that: \[f(x)=\frac{Q(x)}{P(x)}\] where \(P(c) = 0\) and is a linear factor of 3rd degree polynomial \(Q(x)\).
+  Defining in terms of constants and argument variable \(Q(x)=\left(a_1x+b_1\right)\left(a_1x+b_2\right)\left(a_3x+b_3\right)\) and \(P(x)=a_1x+b_1\), the \LaTeX{} output is evaluated as: \[\lim_{x\to{-\frac{b_1}{a_1}}}\left(\frac{\left(a_1a_2a_3\right)x^3+\left(a_1a_2b_3+a_1b_2a_3+b_1a_2a_3\right)x^2+\left(a_1b_2b_3+b_1a_2b_3+b_1b_2a_3\right)x+b_1b_2b_3}{a_1x+b_1}\right)\]
+  The respective \LaTeX{} solution output is evaluated as \[\left(a_2\cdot\frac{-b_1}{a_1}+b_2\right)\left(a_3\cdot\frac{-b_1}{a_1}+b_3\right)=1\]
+\end{document}
