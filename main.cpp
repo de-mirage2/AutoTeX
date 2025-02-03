@@ -177,6 +177,8 @@ void fillTeX(std::ofstream &logObj, std::vector<moduleObj> moduleVec,
 
   outprobObj << "\n\\end{enumerate}\n\\end{document}";
   outsolObj << "\n\\end{enumerate}\n\\end{document}";
+  outprobObj.close();
+  outsolObj.close();
 };
 
 void cleanTeX(std::ofstream &logObj, std::ofstream &outprobObj,
@@ -264,8 +266,8 @@ int main(int argc, char *argv[]) {
   curropts.columns = 2;
 
   char gopt;
-  for (;;) {
-    switch (getopt(argc, argv, "c:i:l:t:LTC:")) {
+  while (gopt != -1) {
+    switch (gopt = getopt(argc, argv, "c:i:l:t:LTC:")) {
     case -1:
       break;
     case 'c':
@@ -310,6 +312,7 @@ int main(int argc, char *argv[]) {
   // system("pdflatex outprob.tex && pdflatex outsol.tex");
 
   // logMsg(outlog, "Finished outprob.pdf & outsol.pdf generation");
+  outlog.close();
 
   return 0;
 }
