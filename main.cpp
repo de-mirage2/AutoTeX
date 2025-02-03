@@ -251,17 +251,17 @@ int main(int argc, char *argv[]) {
   std::vector<moduleObj> modules = interpretModules(inp);
 
   logMsg(outlog,
-         "Module input interpreted, len. = " + std::to_string(modules.size()));
+         "Module input interp, len. = " + std::to_string(modules.size()));
 
   // Additional Options
-  opts getopts;
-  getopts.course = "AutoTeX 101";
-  getopts.instructor = "AutoTeX User";
-  getopts.location = "AutoTeX University";
-  getopts.title = "AutoTeX Limits";
-  getopts.saveLog = false;
-  getopts.saveTeX = true;
-  getopts.columns = 2;
+  opts curropts;
+  curropts.course = "AutoTeX 101";
+  curropts.instructor = "AutoTeX User";
+  curropts.location = "AutoTeX University";
+  curropts.title = "AutoTeX Limits";
+  curropts.saveLog = false;
+  curropts.saveTeX = true;
+  curropts.columns = 2;
 
   char gopt;
   for (;;) {
@@ -269,25 +269,25 @@ int main(int argc, char *argv[]) {
     case -1:
       break;
     case 'c':
-      getopts.course = *optarg; //
+      curropts.course = *optarg; //
       continue;
     case 'i':
-      getopts.instructor = *optarg; //
+      curropts.instructor = *optarg; //
       continue;
     case 'l':
-      getopts.location = *optarg; //
+      curropts.location = *optarg; //
       continue;
     case 't':
-      getopts.title = *optarg; //
+      curropts.title = *optarg; //
       continue;
     case 'L':
-      getopts.saveLog = true;
+      curropts.saveLog = true;
       continue;
     case 'T':
-      getopts.instructor = false;
+      curropts.instructor = false;
       continue;
     case 'C':
-      getopts.columns = *optarg; //
+      curropts.columns = (uint8_t)(optarg[0] - '0'); //
       continue;
     }
   }
@@ -299,7 +299,7 @@ int main(int argc, char *argv[]) {
 
   logMsg(outlog, "Output files created");
 
-  fillTeX(outlog, modules, outprob, outsol, getopts);
+  fillTeX(outlog, modules, outprob, outsol, curropts);
 
   logMsg(outlog, "Finished outprob.tex, outsol.tex generation");
 
