@@ -12,6 +12,12 @@
 #include <vector>
 // #include <stdlib.h>
 
+struct opts {
+  bool saveLog, saveTeX;
+  std::string course, instructor, location, title;
+  uint8_t columns;
+};
+
 struct moduleObj {
   char subject;
   char unit;
@@ -81,12 +87,22 @@ void logMsg(std::ofstream &logObj, std::string msg) {
 }
 
 void fillTeX(std::ofstream &logObj, std::vector<moduleObj> moduleVec,
-             std::ofstream &outprobObj, std::ofstream &outsolObj) {
+             std::ofstream &outprobObj, std::ofstream &outsolObj,
+             const opts o) {
   std::string write =
-      "\\documentclass[12pt,notitlepage]{minimal}\n"
-      "\\usepackage{mathtools,amssymb,amsfonts,empheq,mdframed}\n"
-      "\\usepackage{tikz}\n\n"
+      "\\documentclass[12pt,notitlepage]{article}\n"
+      "\\usepackage{mathtools,amssymb,amsfonts,empheq,mdframed,tikz}\n\n"
+      "\\makeatletter\n\\renewcommand\\@author{" +
+      o.instructor + "}\\renewcommand\\@title{" + o.title +
+      "}\\newcommand\\@course{" + o.course + "}\\newcommand\\@location{" +
+      o.location +
+      "}\\renewcommand\\maketitle{\\topskip0pt\\noindent Name: "
+      "\\rule{6cm}{0.5pt} \\hfill ID: \\rule{3cm} {0.5pt} \\hfill Period: "
+      "\\rule{2cm}{0.5pt}\\begin{center}\\scshape\\@location\\qquad\\@"
+      "course\\\\\\@author\\\\\\textbf{\\@title}\\end{center}}"
+      "\\makeatother\n\n"
       "\\begin{document}\n"
+      "\\maketitle"
       "\\begin{enumerate}\n";
   outprobObj << write;
   outsolObj << write;
@@ -238,39 +254,52 @@ int main(int argc, char *argv[]) {
          "Module input interpreted, len. = " + std::to_string(modules.size()));
 
   // Additional Options
-
-  bool saveTeX = false;
-  bool saveLog = false;
-  uint8_t columns;
+  opts getopts;
+  getopts.course = "AutoTeX 101";
+  getopts.instructor = "AutoTeX User";
+  getopts.location = "AutoTeX University";
+  getopts.title = "AutoTeX Limits";
+  getopts.saveLog = false;
+  getopts.saveTeX = true;
+  getopts.columns = 2;
 
   char gopt;
-  while ((gopt = getopt(argc, argv, "c:lt")) != -1) {
-    switch (gopt) {
+  for (;;) {
+    switch (getopt(argc, argv, "c:i:l:t:LTC:")) {
+    case -1:
+      break;
     case 'c':
-      columns = *optarg; //
-      break;
-    case 't':
-      saveTeX = true;
-      break;
+      getopts.course = *optarg; //
+      continue;
+    case 'i':
+      getopts.instructor = *optarg; //
+      continue;
     case 'l':
-      saveLog = true;
-      break;
+      getopts.location = *optarg; //
+      continue;
+    case 't':
+      getopts.title = *optarg; //
+      continue;
+    case 'L':
+      getopts.saveLog = true;
+      continue;
+    case 'T':
+      getopts.instructor = false;
+      continue;
+    case 'C':
+      getopts.columns = *optarg; //
+      continue;
     }
   }
 
   logMsg(outlog, "Options interpreted");
 
   std::filesystem::create_directory("out");
-  std::ofstream outprob("out/outprob.tex");
-  std::ofstream outsol("out/outsol.tex");
+  std::ofstream outprob("out/outprob.tex"), outsol("out/outsol.tex");
 
   logMsg(outlog, "Output files created");
 
-  /*if (!t) {
-
-  }*/
-
-  fillTeX(outlog, modules, outprob, outsol);
+  fillTeX(outlog, modules, outprob, outsol, getopts);
 
   logMsg(outlog, "Finished outprob.tex, outsol.tex generation");
 

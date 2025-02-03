@@ -1,0 +1,6 @@
+export DOCUMENTCLASS = "article"
+# If DOCUMENTCLASS is set to 'minimal' then the following 2 will not show up:
+export AUTHOR = "AuToTex User"
+export COURSE = "AuToTex Math Course"
+export COLUMN = 2
+export DATE = "\today"
